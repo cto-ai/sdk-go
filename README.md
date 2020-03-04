@@ -1,3 +1,5 @@
+![](https://raw.githubusercontent.com/cto-ai/sdk-go/master/banner.png)
+
 # sdk-go
 
 The Ops Platform SDK for Go

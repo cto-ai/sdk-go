@@ -391,7 +391,7 @@ func OptListAutocomplete(autocomplete bool) ListOption {
 // Example:
 //
 //  p := ctoai.NewPrompt()
-//  resp, err := p.List("platform", "What cloud platform would you like to deploy to?", []string{"AWS", "Google Cloud", "Azure"}, OptListDefault("AWS"), OptListFlag("L"), OptListAutocomplete(true)) // user selects Azure
+//  resp, err := p.List("platform", "What cloud platform would you like to deploy to?", []string{"AWS", "Google Cloud", "Azure"}, OptListDefaultValue("AWS"), OptListFlag("L"), OptListAutocomplete(true)) // user selects Azure
 //  if err != nil {
 //      panic(err)
 //  }
