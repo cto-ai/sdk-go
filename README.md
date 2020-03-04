@@ -21,19 +21,18 @@ import (
 )
 
 func main() {
-	// instantiate new CTO.ai clients
-	u := ctoai.NewUx()
-    p := ctoai.NewPrompt()
+	// instantiate new CTO.ai client
+	client := ctoai.NewClient()
 
 	// printing text to interface
-	err := u.Print("starting e2e test of Go SDK")
+	err := client.Ux.Print("starting e2e test of Go SDK")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// prompt user to confirm
 	// captures user stdin and converts to a bool
-	output, err := p.Confirm("confirmation", "confirm?", ctoai.OptConfirmFlag("C"), ctoai.OptConfirmDefault(true))
+	output, err := client.Prompt.Confirm("confirmation", "confirm?", ctoai.OptConfirmFlag("C"), ctoai.OptConfirmDefault(true))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +40,7 @@ func main() {
 	fmt.Printf("You confirmed with a %v\n", output)
 
 	// displays a progress bar to the interface
-	err = u.ProgressBarStart(5, 1, "Finishing...")
+	err = client.Ux.ProgressBarStart(5, 1, "Finishing...")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,12 +48,12 @@ func main() {
 	// do some work
 	time.Sleep(2 * time.Second)
 
-	err = u.ProgressBarAdvance(4)
+	err = client.Ux.ProgressBarAdvance(4)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = u.ProgressBarStop("Done!")
+	err = client.Ux.ProgressBarStop("Done!")
 	if err != nil {
 		log.Fatal(err)
 	}
