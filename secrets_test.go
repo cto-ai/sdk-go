@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"github.com/cto-ai/sdk-go/internal/daemon"
@@ -13,7 +14,9 @@ import (
 
 func Test_SecretsRequest_GetSecret(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
-
+	expectedBody := daemon.GetSecretBody{
+		Key: "test",
+	}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/secret/get")
 
@@ -23,8 +26,8 @@ func Test_SecretsRequest_GetSecret(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Key != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -50,7 +53,10 @@ func Test_SecretsRequest_GetSecret(t *testing.T) {
 
 func Test_SecretsRequest_SetSecret(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
-
+	expectedBody := daemon.SetSecretBody{
+		Key:   "test",
+		Value: "secret",
+	}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/secret/set")
 
@@ -60,8 +66,8 @@ func Test_SecretsRequest_SetSecret(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Key != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"time"
 
@@ -14,7 +15,16 @@ import (
 
 func Test_PromptRequest_PromptInput(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
-
+	expectedBody := daemon.InputPromptBody{
+		PromptEnvelope: daemon.PromptEnvelope{
+			Name:       "test",
+			PromptType: "input",
+			Message:    "type test",
+			Flag:       "I",
+		},
+		Default:    "error",
+		AllowEmpty: true,
+	}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/prompt")
 
@@ -24,28 +34,8 @@ func Test_PromptRequest_PromptInput(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Name != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.PromptType != "input" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Message != "type test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Default != "error" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Flag != "I" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.AllowEmpty != true {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -71,6 +61,14 @@ func Test_PromptRequest_PromptInput(t *testing.T) {
 
 func Test_PromptRequest_PromptNumber(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
+	expectedBody := map[string]interface{}{
+		"name":    "test",
+		"type":    "number",
+		"message": "type 2",
+		"flag":    "N",
+		"default": float64(0),
+		"minimum": float64(1),
+	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/prompt")
@@ -81,33 +79,10 @@ func Test_PromptRequest_PromptNumber(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp["name"] != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
-		if tmp["type"] != "number" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["message"] != "type 2" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["flag"] != "N" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["default"] != float64(0) {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["minimum"] != float64(1) {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if _, ok := tmp["maximum"]; ok {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
 		fmt.Fprintf(w, expectedResponse)
 	}))
 
@@ -131,6 +106,12 @@ func Test_PromptRequest_PromptNumber(t *testing.T) {
 
 func Test_PromptRequest_PromptSecret(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
+	expectedBody := daemon.SecretPromptBody{
+		Name:       "test",
+		PromptType: "secret",
+		Message:    "what is secret",
+		Flag:       "S",
+	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/prompt")
@@ -141,20 +122,8 @@ func Test_PromptRequest_PromptSecret(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Name != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.PromptType != "secret" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Message != "what is secret" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Flag != "S" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -180,6 +149,15 @@ func Test_PromptRequest_PromptSecret(t *testing.T) {
 
 func Test_PromptRequest_PromptPassword(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
+	expectedBody := daemon.PasswordPromptBody{
+		PromptEnvelope: daemon.PromptEnvelope{
+			Name:       "test",
+			PromptType: "password",
+			Message:    "what is password",
+			Flag:       "P",
+		},
+		Confirm: true,
+	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/prompt")
@@ -190,24 +168,8 @@ func Test_PromptRequest_PromptPassword(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Name != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.PromptType != "password" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Message != "what is password" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Flag != "P" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Confirm != true {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -233,6 +195,15 @@ func Test_PromptRequest_PromptPassword(t *testing.T) {
 
 func Test_PromptRequest_PromptConfirm(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
+	expectedBody := daemon.ConfirmPromptBody{
+		PromptEnvelope: daemon.PromptEnvelope{
+			Name:       "test",
+			PromptType: "confirm",
+			Message:    "confirm?",
+			Flag:       "C",
+		},
+		Default: true,
+	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/prompt")
@@ -243,24 +214,8 @@ func Test_PromptRequest_PromptConfirm(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Name != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.PromptType != "confirm" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Message != "confirm?" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Flag != "C" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Default != true {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -288,6 +243,14 @@ func Test_PromptRequest_PromptList(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
 
 	choices := []string{"aws", "gcd"}
+	expectedBody := map[string]interface{}{
+		"name":    "test",
+		"type":    "list",
+		"message": "choose",
+		"choices": []interface{}{"aws", "gcd"},
+		"default": "aws",
+		"flag":    "L",
+	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/prompt")
@@ -298,32 +261,8 @@ func Test_PromptRequest_PromptList(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp["name"] != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["type"] != "list" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["message"] != "choose" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["choices"].([]interface{})[0] != choices[0] {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["choices"].([]interface{})[1] != choices[1] {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["default"] != "aws" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["flag"] != "L" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -351,6 +290,14 @@ func Test_PromptRequest_PromptAutocomplete(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
 
 	choices := []string{"aws", "gcd"}
+	expectedBody := map[string]interface{}{
+		"name":    "test",
+		"type":    "autocomplete",
+		"message": "choose",
+		"choices": []interface{}{"aws", "gcd"},
+		"default": 1.0,
+		"flag":    "A",
+	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/prompt")
@@ -361,32 +308,8 @@ func Test_PromptRequest_PromptAutocomplete(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp["name"] != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["type"] != "autocomplete" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["message"] != "choose" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["choices"].([]interface{})[0] != choices[0] {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["choices"].([]interface{})[1] != choices[1] {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["default"] != 1.0 {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["flag"] != "A" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -414,6 +337,13 @@ func Test_PromptRequest_PromptCheckbox(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
 
 	choices := []string{"aws", "gcd", "azure"}
+	expectedBody := map[string]interface{}{
+		"name":    "test",
+		"type":    "checkbox",
+		"message": "choose",
+		"choices": []interface{}{"aws", "gcd", "azure"},
+		"flag":    "C",
+	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/prompt")
@@ -424,32 +354,8 @@ func Test_PromptRequest_PromptCheckbox(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp["name"] != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["type"] != "checkbox" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["message"] != "choose" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["flag"] != "C" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["choices"].([]interface{})[0] != choices[0] {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["choices"].([]interface{})[1] != choices[1] {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp["choices"].([]interface{})[2] != choices[2] {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -479,6 +385,15 @@ func Test_PromptRequest_PromptCheckbox(t *testing.T) {
 
 func Test_PromptRequest_PromptEditor(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
+	expectedBody := daemon.EditorPromptBody{
+		PromptEnvelope: daemon.PromptEnvelope{
+			Name:       "test",
+			PromptType: "editor",
+			Message:    "edit",
+			Flag:       "E",
+		},
+		Default: "default",
+	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/prompt")
@@ -489,24 +404,8 @@ func Test_PromptRequest_PromptEditor(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Name != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.PromptType != "editor" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Message != "edit" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Flag != "E" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Default != "default" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -538,6 +437,18 @@ func Test_PromptRequest_PromptDatetime(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error parsing expected time: %v", err)
 	}
+	expectedBody := daemon.DatetimePromptBody{
+		PromptEnvelope: daemon.PromptEnvelope{
+			Name:       "test",
+			PromptType: "datetime",
+			Message:    "what date",
+			Flag:       "D",
+		},
+		Variant: "datetime",
+		Default: input,
+		Minimum: input,
+		Maximum: input,
+	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/prompt")
@@ -548,36 +459,8 @@ func Test_PromptRequest_PromptDatetime(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Name != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.PromptType != "datetime" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Message != "what date" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Variant != "datetime" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Flag != "D" {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Minimum != input {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Maximum != input {
-			t.Errorf("Error unexpected request body: %v", tmp)
-		}
-
-		if tmp.Default != input {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)

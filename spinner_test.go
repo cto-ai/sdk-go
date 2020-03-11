@@ -4,12 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"github.com/cto-ai/sdk-go/internal/daemon"
 )
 
 func Test_SpinnerRequest_spinnerStart(t *testing.T) {
+	expectedBody := daemon.SpinnerStartBody{
+		Text: "start",
+	}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/start-spinner")
 
@@ -19,8 +23,8 @@ func Test_SpinnerRequest_spinnerStart(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Text != "start" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 	}))
 
@@ -36,6 +40,9 @@ func Test_SpinnerRequest_spinnerStart(t *testing.T) {
 }
 
 func Test_SpinnerRequest_spinnerStop(t *testing.T) {
+	expectedBody := daemon.SpinnerStopBody{
+		Text: "stop",
+	}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/stop-spinner")
 
@@ -45,8 +52,8 @@ func Test_SpinnerRequest_spinnerStop(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Text != "stop" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 	}))
 

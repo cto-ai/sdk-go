@@ -4,10 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
 func Test_TrackRequest(t *testing.T) {
+	expectedBody := map[string]interface{}{
+		"event":   "testEvent",
+		"tags":    []interface{}{"tag1", "tag2"},
+		"testKey": "testValue",
+	}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ValidateRequest(t, r, "/track")
 
@@ -17,19 +23,7 @@ func Test_TrackRequest(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp["event"] != "testEvent" {
-			t.Errorf("Error unexpected request body: %+v", tmp)
-		}
-
-		if tmp["tag"].([]interface{})[0] != "tag1" {
-			t.Errorf("Error unexpected request body: %+v", tmp)
-		}
-
-		if tmp["tag"].([]interface{})[1] != "tag2" {
-			t.Errorf("Error unexpected request body: %+v", tmp)
-		}
-
-		if tmp["testKey"] != "testValue" {
+		if !reflect.DeepEqual(tmp, expectedBody) {
 			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 	}))
