@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"net/http/httptest"
-	"os"
+	"reflect"
 	"testing"
 
 	"github.com/cto-ai/sdk-go/internal/daemon"
@@ -15,19 +14,11 @@ import (
 
 func Test_SecretsRequest_GetSecret(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
-
+	expectedBody := daemon.GetSecretBody{
+		Key: "test",
+	}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/secret/get" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/secret/get")
 
 		var tmp daemon.GetSecretBody
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -35,8 +26,8 @@ func Test_SecretsRequest_GetSecret(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Key != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -47,15 +38,7 @@ func Test_SecretsRequest_GetSecret(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": "secret"}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	s := NewSdk()
 	output, err := s.GetSecret("test")
@@ -70,19 +53,12 @@ func Test_SecretsRequest_GetSecret(t *testing.T) {
 
 func Test_SecretsRequest_SetSecret(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
-
+	expectedBody := daemon.SetSecretBody{
+		Key:   "test",
+		Value: "secret",
+	}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/secret/set" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/secret/set")
 
 		var tmp daemon.SetSecretBody
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -90,8 +66,8 @@ func Test_SecretsRequest_SetSecret(t *testing.T) {
 			t.Errorf("Error in decoding response body: %s", err)
 		}
 
-		if tmp.Key != "test" {
-			t.Errorf("Error unexpected request body: %v", tmp)
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
 		}
 
 		fmt.Fprintf(w, expectedResponse)
@@ -102,15 +78,7 @@ func Test_SecretsRequest_SetSecret(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"key": "test"}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	s := NewSdk()
 	key, err := s.SetSecret("test", "secret")
