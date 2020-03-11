@@ -69,7 +69,7 @@ func SyncRequest(endpoint string, body interface{}) (interface{}, error) {
 		Value interface{} `json:"value"`
 	}
 
-	err = json.NewDecoder(resp.body).Decode(&responseBody)
+	err = json.NewDecoder(resp.Body).Decode(&responseBody)
 	if err != nil {
 		return nil, fmt.Errorf("Error decoding daemon response %w", err)
 	}

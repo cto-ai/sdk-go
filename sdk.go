@@ -74,7 +74,7 @@ func (s *Sdk) GetConfig(key string) (interface{}, error) {
 
 // SetConfig sets a value in the config (user-specific) key/value store
 func (s *Sdk) SetConfig(key string, value interface{}) error {
-	return daemon.SimpleRequest("state/set", map[string]interface{}{
+	return daemon.SimpleRequest("config/set", map[string]interface{}{
 		"key":   key,
 		"value": value,
 	})
