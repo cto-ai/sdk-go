@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 	"time"
 
@@ -18,17 +16,7 @@ func Test_PromptRequest_PromptInput(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/prompt" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/prompt")
 
 		var tmp daemon.InputPromptBody
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -68,15 +56,7 @@ func Test_PromptRequest_PromptInput(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": "test"}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	p := NewPrompt()
 	output, err := p.Input("test", "type test", OptInputDefault("error"), OptInputFlag("I"), OptInputAllowEmpty(true))
@@ -93,17 +73,7 @@ func Test_PromptRequest_PromptNumber(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/prompt" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/prompt")
 
 		var tmp map[string]interface{}
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -146,15 +116,7 @@ func Test_PromptRequest_PromptNumber(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": 2}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	p := NewPrompt()
 	output, err := p.Number("test", "type 2", OptNumberFlag("N"), OptNumberDefault(0), OptNumberMinimum(1))
@@ -171,17 +133,7 @@ func Test_PromptRequest_PromptSecret(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/prompt" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/prompt")
 
 		var tmp daemon.SecretPromptBody
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -213,15 +165,7 @@ func Test_PromptRequest_PromptSecret(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": "secret"}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	p := NewPrompt()
 	output, err := p.Secret("test", "what is secret", OptSecretFlag("S"))
@@ -238,17 +182,7 @@ func Test_PromptRequest_PromptPassword(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/prompt" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/prompt")
 
 		var tmp daemon.PasswordPromptBody
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -284,15 +218,7 @@ func Test_PromptRequest_PromptPassword(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": "password"}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	p := NewPrompt()
 	output, err := p.Password("test", "what is password", OptPasswordFlag("P"), OptPasswordConfirm(true))
@@ -309,17 +235,7 @@ func Test_PromptRequest_PromptConfirm(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/prompt" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/prompt")
 
 		var tmp daemon.ConfirmPromptBody
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -355,15 +271,7 @@ func Test_PromptRequest_PromptConfirm(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": false}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	p := NewPrompt()
 	output, err := p.Confirm("test", "confirm?", OptConfirmFlag("C"), OptConfirmDefault(true))
@@ -382,17 +290,7 @@ func Test_PromptRequest_PromptList(t *testing.T) {
 	choices := []string{"aws", "gcd"}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/prompt" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/prompt")
 
 		var tmp map[string]interface{}
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -436,15 +334,7 @@ func Test_PromptRequest_PromptList(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": "gcd"}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	p := NewPrompt()
 	output, err := p.List("test", "choose", choices, OptListDefaultValue("aws"), OptListFlag("L"))
@@ -463,17 +353,7 @@ func Test_PromptRequest_PromptAutocomplete(t *testing.T) {
 	choices := []string{"aws", "gcd"}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/prompt" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/prompt")
 
 		var tmp map[string]interface{}
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -517,15 +397,7 @@ func Test_PromptRequest_PromptAutocomplete(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": "gcd"}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	p := NewPrompt()
 	output, err := p.List("test", "choose", choices, OptListAutocomplete(true), OptListDefaultIndex(1), OptListFlag("A"))
@@ -544,17 +416,7 @@ func Test_PromptRequest_PromptCheckbox(t *testing.T) {
 	choices := []string{"aws", "gcd", "azure"}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/prompt" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/prompt")
 
 		var tmp map[string]interface{}
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -598,15 +460,7 @@ func Test_PromptRequest_PromptCheckbox(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": ["gcd", "azure"]}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	p := NewPrompt()
 	output, err := p.Checkbox("test", "choose", choices, OptCheckboxFlag("C"))
@@ -627,17 +481,7 @@ func Test_PromptRequest_PromptEditor(t *testing.T) {
 	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/prompt" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/prompt")
 
 		var tmp daemon.EditorPromptBody
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -673,15 +517,7 @@ func Test_PromptRequest_PromptEditor(t *testing.T) {
 	// write a fake file
 	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": "test"}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	p := NewPrompt()
 	output, err := p.Editor("test", "edit", OptEditorDefault("default"), OptEditorFlag("E"))
@@ -704,17 +540,7 @@ func Test_PromptRequest_PromptDatetime(t *testing.T) {
 	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/prompt" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/prompt")
 
 		var tmp daemon.DatetimePromptBody
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -762,15 +588,7 @@ func Test_PromptRequest_PromptDatetime(t *testing.T) {
 	// write a fake file
 	err = ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": "2006-01-02T15:04:05Z"}`), 0777)
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	p := NewPrompt()
 	output, err := p.Datetime("test", "what date", OptDatetimeFlag("D"), OptDatetimeDefault(input), OptDatetimeMaximum(input), OptDatetimeMinimum(input))

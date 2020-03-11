@@ -2,26 +2,14 @@ package ctoai
 
 import (
 	"encoding/json"
-	"net"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
 
 func Test_TrackRequest(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Content-Type"][0] != "application/json" {
-			t.Errorf("Headers incorrect: %v", r.Header["Content-Type"])
-		}
-
-		if r.Method != "POST" {
-			t.Errorf("Method incorrect: %v", r.Method)
-		}
-
-		if r.URL.Path != "/track" {
-			t.Errorf("Method incorrect: %v", r.URL.Path)
-		}
+		ValidateRequest(t, r, "/track")
 
 		var tmp map[string]interface{}
 		err := json.NewDecoder(r.Body).Decode(&tmp)
@@ -48,18 +36,13 @@ func Test_TrackRequest(t *testing.T) {
 
 	defer ts.Close()
 
-	_, port, err := net.SplitHostPort(ts.URL[7:])
-	if err != nil {
-		t.Errorf("Error splitting host port: %s", err)
-	}
-
-	err = os.Setenv("SDK_SPEAK_PORT", port)
-	if err != nil {
-		t.Errorf("Error setting test env variable: %s", err)
-	}
+	SetPortVar(t, ts)
 
 	s := NewSdk()
-	s.Track([]string{"tag1", "tag2"}, "testEvent", map[string]interface{}{
+	err := s.Track([]string{"tag1", "tag2"}, "testEvent", map[string]interface{}{
 		"testKey": "testValue",
 	})
+	if err != nil {
+		t.Errorf("Error running track: %v", err)
+	}
 }
