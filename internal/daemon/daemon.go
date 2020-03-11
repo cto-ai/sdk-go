@@ -59,6 +59,24 @@ func SimpleRequest(endpoint string, body interface{}) error {
 	return err
 }
 
+func SyncRequest(endpoint string, body interface{}) (interface{}, error) {
+	resp, err := daemonRequest(endpoint, body)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseBody struct {
+		Value interface{} `json:"value"`
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&responseBody)
+	if err != nil {
+		return nil, fmt.Errorf("Error decoding daemon response %w", err)
+	}
+
+	return responseBody.Value, nil
+}
+
 func AsyncRequest(endpoint string, body interface{}) (map[string]interface{}, error) {
 	resp, err := daemonRequest(endpoint, body)
 	if err != nil {

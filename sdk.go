@@ -1,9 +1,7 @@
 package ctoai
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/cto-ai/sdk-go/internal/daemon"
@@ -56,71 +54,30 @@ func (*Sdk) GetConfigPath() string {
 	return path
 }
 
-type kvFile struct {
-	filename string
-	data     map[string]interface{}
+// GetState returns a value from the state (workflow-local) key/value store
+func (s *Sdk) GetState(key string) (interface{}, error) {
+	return daemon.SyncRequest("state/get", map[string]interface{}{"key": key})
 }
 
-func openKVFile(filename string) *kvFile {
-	data := make(map[string]interface{})
-	if _, err := os.Stat(filename); err != nil {
-		return &kvFile{
-			filename: filename,
-			data:     data,
-		}
-	}
-
-	fileContents, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-
-	err = json.Unmarshal(fileContents, data)
-	if err != nil {
-		panic(err)
-	}
-
-	return &kvFile{
-		filename: filename,
-		data:     data,
-	}
+// SetState sets a value in the state (workflow-local) key/value store
+func (s *Sdk) SetState(key string, value interface{}) error {
+	return daemon.SimpleRequest("state/set", map[string]interface{}{
+		"key":   key,
+		"value": value,
+	})
 }
 
-func (kv *kvFile) get(key string) interface{} {
-	if value, ok := kv.data[key]; ok {
-		return value
-	}
-	return nil
+// GetConfig returns a value from the config (user-specific) key/value store
+func (s *Sdk) GetConfig(key string) (interface{}, error) {
+	return daemon.SyncRequest("config/get", map[string]interface{}{"key": key})
 }
 
-func (kv *kvFile) set(key string, value interface{}) {
-	kv.data[key] = value
-
-	fileContents, err := json.Marshal(kv.data)
-	if err != nil {
-		panic(err)
-	}
-
-	err = ioutil.WriteFile(kv.filename, fileContents, 0644)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func (s *Sdk) GetState(key string) interface{} {
-	return openKVFile(s.GetStatePath() + "/state.json").get(key)
-}
-
-func (s *Sdk) SetState(key string, value interface{}) {
-	openKVFile(s.GetStatePath()+"/state.json").set(key, value)
-}
-
-func (s *Sdk) GetConfig(key string) interface{} {
-	return openKVFile(s.GetConfigPath() + "/config.json").get(key)
-}
-
-func (s *Sdk) SetConfig(key string, value interface{}) {
-	openKVFile(s.GetConfigPath()+"/config.json").set(key, value)
+// SetConfig sets a value in the config (user-specific) key/value store
+func (s *Sdk) SetConfig(key string, value interface{}) error {
+	return daemon.SimpleRequest("config/set", map[string]interface{}{
+		"key":   key,
+		"value": value,
+	})
 }
 
 // GetSecret requests a secret from the secret store by key.
