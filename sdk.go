@@ -59,6 +59,20 @@ func (s *Sdk) GetState(key string) (interface{}, error) {
 	return daemon.SyncRequest("state/get", map[string]interface{}{"key": key})
 }
 
+// GetAllState returns a map of all keys to values in the state (workflow-local) key/value store
+func (s *Sdk) GetAllState() (map[string]interface{}, error) {
+	value, err := daemon.SyncRequest("state/get-all", map[string]interface{}{})
+	if err != nil {
+		return nil, err
+	}
+
+	mapValue, ok := value.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("Received non-object JSON %v", value)
+	}
+	return mapValue, nil
+}
+
 // SetState sets a value in the state (workflow-local) key/value store
 func (s *Sdk) SetState(key string, value interface{}) error {
 	return daemon.SimpleRequest("state/set", map[string]interface{}{
@@ -70,6 +84,20 @@ func (s *Sdk) SetState(key string, value interface{}) error {
 // GetConfig returns a value from the config (user-specific) key/value store
 func (s *Sdk) GetConfig(key string) (interface{}, error) {
 	return daemon.SyncRequest("config/get", map[string]interface{}{"key": key})
+}
+
+// GetAllConfig returns a map of all keys to values in the config (workflow-local) key/value store
+func (s *Sdk) GetAllConfig() (map[string]interface{}, error) {
+	value, err := daemon.SyncRequest("config/get-all", map[string]interface{}{})
+	if err != nil {
+		return nil, err
+	}
+
+	mapValue, ok := value.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("Received non-object JSON %v", value)
+	}
+	return mapValue, nil
 }
 
 // SetConfig sets a value in the config (user-specific) key/value store
