@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/cto-ai/sdk-go/master/banner.png)
+![](https://cto.ai/static/sdk-banner.png)
 
 # sdk-go
 
