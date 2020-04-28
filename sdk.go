@@ -82,12 +82,21 @@ func (s *Sdk) SetState(key string, value interface{}) error {
 }
 
 // GetConfig returns a value from the config (user-specific) key/value store
-func (s *Sdk) GetConfig(key string) (interface{}, error) {
-	return daemon.SyncRequest("config/get", map[string]interface{}{"key": key})
+func (s *Sdk) GetConfig(key string) (string, error) {
+	daemonValue, err := daemon.SyncRequest("config/get", map[string]interface{}{"key": key})
+	if err != nil {
+		return "", err
+	}
+
+	stringValue, ok := daemonValue.(string)
+	if !ok {
+		return "", fmt.Errorf("Received non-string JSON %v", daemonValue)
+	}
+	return stringValue, nil
 }
 
 // GetAllConfig returns a map of all keys to values in the config (workflow-local) key/value store
-func (s *Sdk) GetAllConfig() (map[string]interface{}, error) {
+func (s *Sdk) GetAllConfig() (map[string]string, error) {
 	value, err := daemon.SyncRequest("config/get-all", map[string]interface{}{})
 	if err != nil {
 		return nil, err
@@ -97,11 +106,22 @@ func (s *Sdk) GetAllConfig() (map[string]interface{}, error) {
 	if !ok {
 		return nil, fmt.Errorf("Received non-object JSON %v", value)
 	}
-	return mapValue, nil
+
+	result := make(map[string]string)
+
+	for k, v := range mapValue {
+		strV, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("Received non-string JSON %v", v)
+		}
+		result[k] = strV
+	}
+
+	return result, nil
 }
 
 // SetConfig sets a value in the config (user-specific) key/value store
-func (s *Sdk) SetConfig(key string, value interface{}) error {
+func (s *Sdk) SetConfig(key string, value string) error {
 	return daemon.SimpleRequest("config/set", map[string]interface{}{
 		"key":   key,
 		"value": value,
