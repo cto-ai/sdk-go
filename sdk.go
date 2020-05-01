@@ -83,7 +83,7 @@ func (s *Sdk) SetState(key string, value interface{}) error {
 
 // GetConfig returns a value from the config (user-specific) key/value store
 func (s *Sdk) GetConfig(key string) (string, error) {
-	daemonValue, err := daemon.SyncRequest("config/get", map[string]interface{}{"key": key})
+	daemonValue, err := daemon.SyncRequest("config/get", map[string]string{"key": key})
 	if err != nil {
 		return "", err
 	}
@@ -97,7 +97,7 @@ func (s *Sdk) GetConfig(key string) (string, error) {
 
 // GetAllConfig returns a map of all keys to values in the config (workflow-local) key/value store
 func (s *Sdk) GetAllConfig() (map[string]string, error) {
-	value, err := daemon.SyncRequest("config/get-all", map[string]interface{}{})
+	value, err := daemon.SyncRequest("config/get-all", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (s *Sdk) GetAllConfig() (map[string]string, error) {
 
 // SetConfig sets a value in the config (user-specific) key/value store
 func (s *Sdk) SetConfig(key string, value string) error {
-	return daemon.SimpleRequest("config/set", map[string]interface{}{
+	return daemon.SimpleRequest("config/set", map[string]string{
 		"key":   key,
 		"value": value,
 	})
