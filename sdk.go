@@ -88,6 +88,10 @@ func (s *Sdk) GetConfig(key string) (string, error) {
 		return "", err
 	}
 
+	if daemonValue == nil {
+		return "", nil
+	}
+
 	stringValue, ok := daemonValue.(string)
 	if !ok {
 		return "", fmt.Errorf("Received non-string JSON %v", daemonValue)
