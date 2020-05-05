@@ -37,6 +37,7 @@ func (*Sdk) HomeDir() string {
 }
 
 // GetStatePath returns the path to the state directory (local to this particular workflow)
+// DEPRECATED: use `HomeDir` instead.
 func (*Sdk) GetStatePath() string {
 	path := os.Getenv("SDK_STATE_DIR")
 	if path == "" {
@@ -46,6 +47,7 @@ func (*Sdk) GetStatePath() string {
 }
 
 // GetConfigPath returns the path to the config directory (local to this particular op)
+// DEPRECATED: incompatible with current config API
 func (*Sdk) GetConfigPath() string {
 	path := os.Getenv("SDK_CONFIG_DIR")
 	if path == "" {
@@ -55,11 +57,13 @@ func (*Sdk) GetConfigPath() string {
 }
 
 // GetState returns a value from the state (workflow-local) key/value store
+// DEPRECATED: state is used by deprecated workflows feature
 func (s *Sdk) GetState(key string) (interface{}, error) {
 	return daemon.SyncRequest("state/get", map[string]interface{}{"key": key})
 }
 
 // GetAllState returns a map of all keys to values in the state (workflow-local) key/value store
+// DEPRECATED: state is used by deprecated workflows feature
 func (s *Sdk) GetAllState() (map[string]interface{}, error) {
 	value, err := daemon.SyncRequest("state/get-all", map[string]interface{}{})
 	if err != nil {
@@ -74,6 +78,7 @@ func (s *Sdk) GetAllState() (map[string]interface{}, error) {
 }
 
 // SetState sets a value in the state (workflow-local) key/value store
+// DEPRECATED: state is used by deprecated workflows feature
 func (s *Sdk) SetState(key string, value interface{}) error {
 	return daemon.SimpleRequest("state/set", map[string]interface{}{
 		"key":   key,
