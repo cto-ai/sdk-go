@@ -137,6 +137,21 @@ func (s *Sdk) SetConfig(key string, value string) error {
 	})
 }
 
+// DeleteConfig deletes a value from the config (user-specific) key/value store
+// Returns false if key not found, true if success
+func (s *Sdk) DeleteConfig(key string) (bool, error) {
+	daemonValue, err := daemon.SyncRequest("config/delete", map[string]string{"key": key})
+	if err != nil {
+		return false, err
+	}
+
+	valueDeleted, ok := daemonValue.(bool)
+	if !ok {
+		return false, fmt.Errorf("Received non-boolean JSON %v", daemonValue)
+	}
+	return valueDeleted, nil
+}
+
 // GetSecret requests a secret from the secret store by key.
 //
 // If the secret exists, it is returned, with the daemon notifying the user that it is in use.
