@@ -43,7 +43,7 @@ func Test_TrackRequest(t *testing.T) {
 }
 
 func TestEvents_Success(t *testing.T) {
-	expectedResponse := `{"value": [{"event": "test"}]}`
+	expectedResponse := `{"value": [{"event": "test"}, {"data": "code"}]}`
 	expectedBody := map[string]interface{}{
 		"start": "2020-01-01",
 		"end":   "2020-06-01",
@@ -77,6 +77,9 @@ func TestEvents_Success(t *testing.T) {
 	if !reflect.DeepEqual(output, []map[string]interface{}{
 		map[string]interface{}{
 			"event": "test",
+		},
+		map[string]interface{}{
+			"data": "code",
 		},
 	}) {
 		t.Errorf("Error unexpected output: %v", output)
