@@ -1,6 +1,7 @@
 package ctoai
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -208,4 +209,31 @@ func (*Sdk) Track(tags []string, event string, metadata map[string]interface{}) 
 	_ = daemon.SimpleRequest("track", requestBody)
 
 	return nil
+}
+
+func (*Sdk) Events(start, end string) ([]map[string]interface{}, error) {
+	result, err := daemon.SyncRequest("events", daemon.EventsBody{
+		Start: start,
+		End:   end,
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("error getting events from backend: %w", err)
+	}
+
+	slice, ok := result.([]interface{})
+	if !ok {
+		return nil, errors.New("backend returned non-array JSON")
+	}
+
+	events := make([]map[string]interface{}, len(slice))
+	for i, entry := range slice {
+		obj, ok := entry.(map[string]interface{})
+		if !ok {
+			return nil, errors.New("backend returned non-object JSON entries")
+		}
+		events[i] = obj
+	}
+
+	return events, nil
 }
