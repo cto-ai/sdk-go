@@ -30,3 +30,8 @@ type ProgressBarAdvanceBody struct {
 }
 
 type ProgressBarStopBody = SpinnerStopBody
+
+type EventsBody struct {
+	Start string `json:"start"`
+	End   string `json:"end"`
+}
