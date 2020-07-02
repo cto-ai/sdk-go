@@ -1,14 +1,34 @@
 package ctoai
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/cto-ai/sdk-go/internal/daemon"
 )
 
 // Ux is the object that contains the UX methods
 type Ux struct{}
 
+// NewUx creates a new Ux object and returns it
 func NewUx() *Ux {
 	return &Ux{}
+}
+
+// Bold adds formatting for boldface type to the given text
+func (*Ux) Bold(text string) string {
+	if os.Getenv("SDK_INTERFACE_TYPE") == "slack" {
+		return fmt.Sprintf("*%s*", text)
+	}
+	return fmt.Sprintf("\033[1m%s\033[0m", text)
+}
+
+// Italic adds formatting for italic type to the given text
+func (*Ux) Italic(text string) string {
+	if os.Getenv("SDK_INTERFACE_TYPE") == "slack" {
+		return fmt.Sprintf("_%s_", text)
+	}
+	return fmt.Sprintf("\033[3m%s\033[23m", text)
 }
 
 // Print prints text to the output interface (i.e. terminal/slack).
