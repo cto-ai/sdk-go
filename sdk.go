@@ -153,12 +153,28 @@ func (s *Sdk) DeleteConfig(key string) (bool, error) {
 	return valueDeleted, nil
 }
 
+// GetSecretOption is an option for the GetSecret function
+type GetSecretOption func(*daemon.GetSecretBody)
+
+// OptGetSecretHidden suppresses the notification that a secret has been retrieved for this request
+func OptGetSecretHidden() GetSecretOption {
+	return func(body *daemon.GetSecretBody) {
+		body.Hidden = true
+	}
+}
+
 // GetSecret requests a secret from the secret store by key.
 //
 // If the secret exists, it is returned, with the daemon notifying the user that it is in use.
 // Otherwise, the user is prompted to provide a replacement.
-func (*Sdk) GetSecret(key string) (string, error) {
-	body, err := daemon.AsyncRequest("secret/get", daemon.GetSecretBody{Key: key})
+func (*Sdk) GetSecret(key string, options ...GetSecretOption) (string, error) {
+
+	requestBody := daemon.GetSecretBody{Key: key}
+	for _, option := range options {
+		option(&requestBody)
+	}
+
+	body, err := daemon.AsyncRequest("secret/get", requestBody)
 	if err != nil {
 		return "", err
 	}

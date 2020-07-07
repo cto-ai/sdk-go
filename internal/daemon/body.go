@@ -1,7 +1,9 @@
 package daemon
 
+// GetSecretBody is the JSON body expected by the /secret/get endpoint
 type GetSecretBody struct {
-	Key string `json:"key"`
+	Key    string `json:"key"`
+	Hidden bool   `json:"hidden"`
 }
 
 type SetSecretBody struct {
