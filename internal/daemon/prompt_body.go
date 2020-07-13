@@ -2,7 +2,6 @@ package daemon
 
 import (
 	"encoding/json"
-	"time"
 )
 
 // PromptEnvelope is the common fields for all prompt type JSON bodies
@@ -145,8 +144,8 @@ type EditorPromptBody struct {
 // DatetimePromptBody is the JSON body for a datetime prompt
 type DatetimePromptBody struct {
 	PromptEnvelope
-	Variant string    `json:"variant"`
-	Default time.Time `json:"default,omitempty"`
-	Maximum time.Time `json:"maximum,omitempty"`
-	Minimum time.Time `json:"minimum,omitempty"`
+	Variant string `json:"variant"`
+	Default string `json:"default,omitempty"`
+	Maximum string `json:"maximum,omitempty"`
+	Minimum string `json:"minimum,omitempty"`
 }

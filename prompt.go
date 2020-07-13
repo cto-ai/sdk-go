@@ -598,19 +598,19 @@ func OptDatetimeVariant(variant string) DatetimeOption {
 
 func OptDatetimeDefault(defaultValue time.Time) DatetimeOption {
 	return func(definition *daemon.DatetimePromptBody) {
-		definition.Default = defaultValue
+		definition.Default = defaultValue.Format(time.RFC3339)
 	}
 }
 
 func OptDatetimeMaximum(maximumValue time.Time) DatetimeOption {
 	return func(definition *daemon.DatetimePromptBody) {
-		definition.Maximum = maximumValue
+		definition.Maximum = maximumValue.Format(time.RFC3339)
 	}
 }
 
 func OptDatetimeMinimum(minimumValue time.Time) DatetimeOption {
 	return func(definition *daemon.DatetimePromptBody) {
-		definition.Minimum = minimumValue
+		definition.Minimum = minimumValue.Format(time.RFC3339)
 	}
 }
 
