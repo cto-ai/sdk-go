@@ -445,9 +445,9 @@ func Test_PromptRequest_PromptDatetime(t *testing.T) {
 			Flag:       "D",
 		},
 		Variant: "datetime",
-		Default: input,
-		Minimum: input,
-		Maximum: input,
+		Default: expectedRequest,
+		Minimum: expectedRequest,
+		Maximum: expectedRequest,
 	}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -475,6 +475,60 @@ func Test_PromptRequest_PromptDatetime(t *testing.T) {
 
 	p := NewPrompt()
 	output, err := p.Datetime("test", "what date", OptDatetimeFlag("D"), OptDatetimeDefault(input), OptDatetimeMaximum(input), OptDatetimeMinimum(input))
+	if err != nil {
+		t.Errorf("Error in prompt request: %v", err)
+	}
+
+	const format = "2006-01-02 15:04:05"
+
+	expected, err := time.Parse(format, "2006-01-02 15:04:05")
+	if err != nil {
+		t.Errorf("Error parsing expected time: %v", err)
+	}
+
+	if output != expected {
+		t.Errorf("Error unexpected output: %v", output)
+	}
+}
+
+func Test_PromptRequest_PromptDatetimeMinimumOptions(t *testing.T) {
+	expectedResponse := `{"replyFilename": "/tmp/response-mocktest"}`
+
+	expectedBody := daemon.DatetimePromptBody{
+		PromptEnvelope: daemon.PromptEnvelope{
+			Name:       "test",
+			PromptType: "datetime",
+			Message:    "what date",
+			Flag:       "D",
+		},
+		Variant: "datetime",
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ValidateRequest(t, r, "/prompt")
+
+		var tmp daemon.DatetimePromptBody
+		err := json.NewDecoder(r.Body).Decode(&tmp)
+		if err != nil {
+			t.Errorf("Error in decoding response body: %s", err)
+		}
+
+		if !reflect.DeepEqual(tmp, expectedBody) {
+			t.Errorf("Error unexpected request body: %+v", tmp)
+		}
+
+		fmt.Fprintf(w, expectedResponse)
+	}))
+
+	defer ts.Close()
+
+	// write a fake file
+	err := ioutil.WriteFile("/tmp/response-mocktest", []byte(`{"test": "2006-01-02T15:04:05Z"}`), 0777)
+
+	SetPortVar(t, ts)
+
+	p := NewPrompt()
+	output, err := p.Datetime("test", "what date", OptDatetimeFlag("D"))
 	if err != nil {
 		t.Errorf("Error in prompt request: %v", err)
 	}
