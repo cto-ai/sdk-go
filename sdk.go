@@ -227,6 +227,24 @@ func (*Sdk) Track(tags []string, event string, metadata map[string]interface{}) 
 	return nil
 }
 
+// The event, tags, and payload will be logged.
+func (*Sdk) StartOp(workflowName string) error {
+	tags := [1]string{
+		"trigger",
+	}
+
+	requestBody := map[string]interface{}{
+		"tags":         tags,
+		"workflowName": workflowName,
+		"trigger":      true,
+	}
+
+	// We suppress this error to be consistent with other languages
+	_ = daemon.SimpleRequest("track", requestBody)
+
+	return nil
+}
+
 func (*Sdk) Events(start, end string) ([]map[string]interface{}, error) {
 	result, err := daemon.SyncRequest("events", daemon.EventsBody{
 		Start: start,
