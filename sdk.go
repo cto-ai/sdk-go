@@ -228,7 +228,7 @@ func (*Sdk) Track(tags []string, event string, metadata map[string]interface{}) 
 }
 
 // The event, tags, and payload will be logged.
-func (*Sdk) StartOp(workflowName string) error {
+func (*Sdk) Start(workflowName string) error {
 	tags := [1]string{
 		"trigger",
 	}
