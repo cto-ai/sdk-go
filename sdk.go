@@ -289,7 +289,7 @@ func (*Sdk) User() (UserInfo, error) {
 
 	mapValue, _ := result.(map[string]string)
 
-	fmt.Printf("%v", mapValue)
+	fmt.Printf("mapValue: %v", mapValue)
 
 	userInfo := UserInfo{
 		ID:       mapValue["id"],
