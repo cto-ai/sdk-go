@@ -287,10 +287,14 @@ func (*Sdk) User() (UserInfo, error) {
 		return UserInfo{}, fmt.Errorf("error getting user information: %w", err)
 	}
 
+	mapValue, _ := result.(map[string]string)
+
+	fmt.Printf("%v", mapValue)
+
 	userInfo := UserInfo{
-		ID:       result.id,
-		Username: result.username,
-		Email:    result.email,
+		ID:       mapValue["id"],
+		Username: mapValue["username"],
+		Email:    mapValue["email"],
 	}
 
 	return userInfo, nil
