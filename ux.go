@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cto-ai/sdk-go/internal/daemon"
+	"github.com/cto-ai/sdk-go/v2/internal/daemon"
 )
 
 // Ux is the object that contains the UX methods

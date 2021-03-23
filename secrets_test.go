@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cto-ai/sdk-go/internal/daemon"
+	"github.com/cto-ai/sdk-go/v2/internal/daemon"
 )
 
 func Test_SecretsRequest_GetSecret(t *testing.T) {

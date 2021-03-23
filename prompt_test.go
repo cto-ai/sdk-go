@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cto-ai/sdk-go/internal/daemon"
+	"github.com/cto-ai/sdk-go/v2/internal/daemon"
 )
 
 func Test_PromptRequest_PromptInput(t *testing.T) {

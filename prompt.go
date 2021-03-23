@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cto-ai/sdk-go/internal/daemon"
+	"github.com/cto-ai/sdk-go/v2/internal/daemon"
 )
 
 // Prompt is the object that contains the prompt methods

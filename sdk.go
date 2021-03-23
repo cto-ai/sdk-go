@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cto-ai/sdk-go/internal/daemon"
+	"github.com/cto-ai/sdk-go/v2/internal/daemon"
 )
 
 func getenv(name, fallback string) string {
