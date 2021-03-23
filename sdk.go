@@ -281,7 +281,7 @@ type UserInfo struct {
 func (*Sdk) User() (UserInfo, error) {
 	var body interface{}
 	method := "GET"
-	result, err := daemon.SyncRequest("users", body, method)
+	result, err := daemon.SyncRequest("user", body, method)
 
 	if err != nil {
 		return UserInfo{}, fmt.Errorf("error getting user information: %w", err)
