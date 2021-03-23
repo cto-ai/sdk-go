@@ -71,7 +71,7 @@ func (*Prompt) Input(name, msg string, options ...InputOption) (string, error) {
 		option(&definition)
 	}
 
-	body, err := daemon.AsyncRequest("prompt", definition)
+	body, err := daemon.AsyncRequest("prompt", definition, "POST")
 	if err != nil {
 		return "", err
 	}
@@ -146,7 +146,7 @@ func (*Prompt) Number(name, msg string, options ...NumberOption) (int, error) {
 		option(&definition)
 	}
 
-	body, err := daemon.AsyncRequest("prompt", definition)
+	body, err := daemon.AsyncRequest("prompt", definition, "POST")
 	if err != nil {
 		return 0, err
 	}
@@ -206,7 +206,7 @@ func (*Prompt) Secret(name, msg string, options ...SecretOption) (string, error)
 		option(&definition)
 	}
 
-	body, err := daemon.AsyncRequest("prompt", definition)
+	body, err := daemon.AsyncRequest("prompt", definition, "POST")
 	if err != nil {
 		return "", err
 	}
@@ -274,7 +274,7 @@ func (*Prompt) Password(name, msg string, options ...PasswordOption) (string, er
 		option(&definition)
 	}
 
-	body, err := daemon.AsyncRequest("prompt", definition)
+	body, err := daemon.AsyncRequest("prompt", definition, "POST")
 	if err != nil {
 		return "", err
 	}
@@ -332,7 +332,7 @@ func (*Prompt) Confirm(name, msg string, options ...ConfirmOption) (bool, error)
 		option(&definition)
 	}
 
-	body, err := daemon.AsyncRequest("prompt", definition)
+	body, err := daemon.AsyncRequest("prompt", definition, "POST")
 	if err != nil {
 		return false, err
 	}
@@ -413,7 +413,7 @@ func (*Prompt) List(name, msg string, choices []string, options ...ListOption) (
 		option(&definition)
 	}
 
-	body, err := daemon.AsyncRequest("prompt", definition)
+	body, err := daemon.AsyncRequest("prompt", definition, "POST")
 	if err != nil {
 		return "", err
 	}
@@ -484,7 +484,7 @@ func (*Prompt) Checkbox(name, msg string, choices []string, options ...CheckboxO
 		option(&definition)
 	}
 
-	body, err := daemon.AsyncRequest("prompt", definition)
+	body, err := daemon.AsyncRequest("prompt", definition, "POST")
 	if err != nil {
 		return nil, err
 	}
@@ -558,7 +558,7 @@ func (*Prompt) Editor(name, msg string, options ...EditorOption) (string, error)
 		option(&definition)
 	}
 
-	body, err := daemon.AsyncRequest("prompt", definition)
+	body, err := daemon.AsyncRequest("prompt", definition, "POST")
 	if err != nil {
 		return "", err
 	}
@@ -645,7 +645,7 @@ func (*Prompt) Datetime(name, msg string, options ...DatetimeOption) (time.Time,
 		option(&definition)
 	}
 
-	body, err := daemon.AsyncRequest("prompt", definition)
+	body, err := daemon.AsyncRequest("prompt", definition, "POST")
 	if err != nil {
 		return time.Unix(0, 0), err
 	}

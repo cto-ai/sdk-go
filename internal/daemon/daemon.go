@@ -26,17 +26,25 @@ func port() int {
 	return port
 }
 
-func daemonRequest(endpoint string, body interface{}) (*http.Response, error) {
+func daemonRequest(endpoint string, body interface{}, method string) (*http.Response, error) {
 	bodyBytes, err := json.Marshal(body)
 	if err != nil {
 		return nil, fmt.Errorf("Error marshalling JSON body: %w", err)
 	}
 
-	resp, err := http.Post(
-		fmt.Sprintf("http://127.0.0.1:%d/%s", port(), endpoint),
-		"application/json",
-		bytes.NewBuffer(bodyBytes),
-	)
+	var resp *http.Response
+
+	if method == "POST" {
+		resp, err = http.Post(
+			fmt.Sprintf("http://127.0.0.1:%d/%s", port(), endpoint),
+			"application/json",
+			bytes.NewBuffer(bodyBytes),
+		)
+	} else if method == "GET" {
+		resp, err = http.Get(
+			fmt.Sprintf("http://127.0.0.1:%d/%s", port(), endpoint),
+		)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("Error in daemon request: %w", err)
 	}
@@ -54,13 +62,13 @@ func daemonRequest(endpoint string, body interface{}) (*http.Response, error) {
 	return resp, nil
 }
 
-func SimpleRequest(endpoint string, body interface{}) error {
-	_, err := daemonRequest(endpoint, body)
+func SimpleRequest(endpoint string, body interface{}, method string) error {
+	_, err := daemonRequest(endpoint, body, method)
 	return err
 }
 
-func SyncRequest(endpoint string, body interface{}) (interface{}, error) {
-	resp, err := daemonRequest(endpoint, body)
+func SyncRequest(endpoint string, body interface{}, method string) (interface{}, error) {
+	resp, err := daemonRequest(endpoint, body, method)
 	if err != nil {
 		return nil, err
 	}
@@ -77,8 +85,8 @@ func SyncRequest(endpoint string, body interface{}) (interface{}, error) {
 	return responseBody.Value, nil
 }
 
-func AsyncRequest(endpoint string, body interface{}) (map[string]interface{}, error) {
-	resp, err := daemonRequest(endpoint, body)
+func AsyncRequest(endpoint string, body interface{}, method string) (map[string]interface{}, error) {
+	resp, err := daemonRequest(endpoint, body, method)
 	if err != nil {
 		return nil, err
 	}
