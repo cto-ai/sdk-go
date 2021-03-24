@@ -278,6 +278,7 @@ type UserInfo struct {
 	Email    string `json:"email"`
 }
 
+// User returns the user info for the current user running the Op.
 func (*Sdk) User() (UserInfo, error) {
 	var body interface{}
 	method := "GET"
@@ -288,14 +289,16 @@ func (*Sdk) User() (UserInfo, error) {
 	}
 	fmt.Printf("result: %v", result)
 
-	mapValue, _ := result.(map[string]string)
-
-	fmt.Printf("mapValue: %v", mapValue)
-
-	userInfo := UserInfo{
-		ID:       mapValue["id"],
-		Username: mapValue["username"],
-		Email:    mapValue["email"],
+	mapValue := result.(map[string]interface{})
+	userInfo := UserInfo{}
+	if id, ok := mapValue["id"].(string); ok {
+		userInfo.ID = id
+	}
+	if username, ok := mapValue["username"].(string); ok {
+		userInfo.Username = username
+	}
+	if email, ok := mapValue["email"].(string); ok {
+		userInfo.Email = email
 	}
 
 	return userInfo, nil
