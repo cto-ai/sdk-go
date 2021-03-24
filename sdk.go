@@ -286,6 +286,7 @@ func (*Sdk) User() (UserInfo, error) {
 	if err != nil {
 		return UserInfo{}, fmt.Errorf("error getting user information: %w", err)
 	}
+	fmt.Printf("result: %v", result)
 
 	mapValue, _ := result.(map[string]string)
 
