@@ -272,6 +272,7 @@ func (*Sdk) Events(start, end string) ([]map[string]interface{}, error) {
 	return events, nil
 }
 
+// UserInfo contains user info returned by daemon.
 type UserInfo struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
@@ -287,8 +288,8 @@ func (*Sdk) User() (UserInfo, error) {
 	if err != nil {
 		return UserInfo{}, fmt.Errorf("error getting user information: %w", err)
 	}
-	fmt.Printf("result: %v", result)
 
+	// map results to UserInfo
 	mapValue := result.(map[string]interface{})
 	userInfo := UserInfo{}
 	if id, ok := mapValue["id"].(string); ok {
