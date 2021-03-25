@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cto-ai/sdk-go/internal/daemon"
+	"github.com/cto-ai/sdk-go/v2/internal/daemon"
 )
 
 // Ux is the object that contains the UX methods
@@ -45,7 +45,7 @@ func (*Ux) Italic(text string) string {
 //
 // testing
 func (*Ux) Print(text string) error {
-	return daemon.SimpleRequest("print", daemon.PrintBody{Text: text})
+	return daemon.SimpleRequest("print", daemon.PrintBody{Text: text}, "POST")
 }
 
 // SpinnerStart presents a spinner on the output interface
@@ -63,7 +63,7 @@ func (*Ux) Print(text string) error {
 // Output:
 // [spinner emoji w/ spinner animation here] Starting process...
 func (*Ux) SpinnerStart(text string) error {
-	return daemon.SimpleRequest("start-spinner", daemon.SpinnerStartBody{Text: text})
+	return daemon.SimpleRequest("start-spinner", daemon.SpinnerStartBody{Text: text}, "POST")
 }
 
 // SpinnerStop stops a spinner that has been previously started on the
@@ -81,7 +81,7 @@ func (*Ux) SpinnerStart(text string) error {
 // Output:
 // [spinner completed completed here] Done!
 func (*Ux) SpinnerStop(text string) error {
-	return daemon.SimpleRequest("stop-spinner", daemon.SpinnerStopBody{Text: text})
+	return daemon.SimpleRequest("stop-spinner", daemon.SpinnerStopBody{Text: text}, "POST")
 }
 
 // ProgressBarStart presents a progressbar on the output interface
@@ -106,7 +106,7 @@ func (*Ux) SpinnerStop(text string) error {
 // Output:
 // [progressbar animation with 1/5 of the bar filled here] Downloading...
 func (*Ux) ProgressBarStart(length, initial int, message string) error {
-	return daemon.SimpleRequest("progress-bar/start", daemon.ProgressBarStartBody{Length: length, Initial: initial, Text: message})
+	return daemon.SimpleRequest("progress-bar/start", daemon.ProgressBarStartBody{Length: length, Initial: initial, Text: message}, "POST")
 }
 
 // ProgressBarAdvance adds onto a progressbar that is already present
@@ -127,7 +127,7 @@ func (*Ux) ProgressBarStart(length, initial int, message string) error {
 // Output:
 // [progressbar animation with 2/5 of the bar filled here] Downloading...
 func (*Ux) ProgressBarAdvance(increment int) error {
-	return daemon.SimpleRequest("progress-bar/advance", daemon.ProgressBarAdvanceBody{Increment: increment})
+	return daemon.SimpleRequest("progress-bar/advance", daemon.ProgressBarAdvanceBody{Increment: increment}, "POST")
 }
 
 // ProgressBarStop completes a progressbar that is already present on
@@ -147,5 +147,5 @@ func (*Ux) ProgressBarAdvance(increment int) error {
 // Output:
 // [progressbar animation with 5/5 of the bar filled here] Done!
 func (*Ux) ProgressBarStop(message string) error {
-	return daemon.SimpleRequest("progress-bar/stop", daemon.ProgressBarStopBody{Text: message})
+	return daemon.SimpleRequest("progress-bar/stop", daemon.ProgressBarStopBody{Text: message}, "POST")
 }

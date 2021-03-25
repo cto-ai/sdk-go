@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cto-ai/sdk-go/internal/daemon"
+	"github.com/cto-ai/sdk-go/v2/internal/daemon"
 )
 
 func getenv(name, fallback string) string {
@@ -60,13 +60,13 @@ func (*Sdk) GetConfigPath() string {
 // GetState returns a value from the state (workflow-local) key/value store
 // DEPRECATED: state is used by deprecated workflows feature
 func (s *Sdk) GetState(key string) (interface{}, error) {
-	return daemon.SyncRequest("state/get", map[string]interface{}{"key": key})
+	return daemon.SyncRequest("state/get", map[string]interface{}{"key": key}, "POST")
 }
 
 // GetAllState returns a map of all keys to values in the state (workflow-local) key/value store
 // DEPRECATED: state is used by deprecated workflows feature
 func (s *Sdk) GetAllState() (map[string]interface{}, error) {
-	value, err := daemon.SyncRequest("state/get-all", map[string]interface{}{})
+	value, err := daemon.SyncRequest("state/get-all", map[string]interface{}{}, "POST")
 	if err != nil {
 		return nil, err
 	}
@@ -84,12 +84,12 @@ func (s *Sdk) SetState(key string, value interface{}) error {
 	return daemon.SimpleRequest("state/set", map[string]interface{}{
 		"key":   key,
 		"value": value,
-	})
+	}, "POST")
 }
 
 // GetConfig returns a value from the config (user-specific) key/value store
 func (s *Sdk) GetConfig(key string) (string, error) {
-	daemonValue, err := daemon.SyncRequest("config/get", map[string]string{"key": key})
+	daemonValue, err := daemon.SyncRequest("config/get", map[string]string{"key": key}, "POST")
 	if err != nil {
 		return "", err
 	}
@@ -107,7 +107,7 @@ func (s *Sdk) GetConfig(key string) (string, error) {
 
 // GetAllConfig returns a map of all keys to values in the config (workflow-local) key/value store
 func (s *Sdk) GetAllConfig() (map[string]string, error) {
-	value, err := daemon.SyncRequest("config/get-all", map[string]string{})
+	value, err := daemon.SyncRequest("config/get-all", map[string]string{}, "POST")
 	if err != nil {
 		return nil, err
 	}
@@ -135,13 +135,13 @@ func (s *Sdk) SetConfig(key string, value string) error {
 	return daemon.SimpleRequest("config/set", map[string]string{
 		"key":   key,
 		"value": value,
-	})
+	}, "POST")
 }
 
 // DeleteConfig deletes a value from the config (user-specific) key/value store
 // Returns false if key not found, true if success
 func (s *Sdk) DeleteConfig(key string) (bool, error) {
-	daemonValue, err := daemon.SyncRequest("config/delete", map[string]string{"key": key})
+	daemonValue, err := daemon.SyncRequest("config/delete", map[string]string{"key": key}, "POST")
 	if err != nil {
 		return false, err
 	}
@@ -174,7 +174,7 @@ func (*Sdk) GetSecret(key string, options ...GetSecretOption) (string, error) {
 		option(&requestBody)
 	}
 
-	body, err := daemon.AsyncRequest("secret/get", requestBody)
+	body, err := daemon.AsyncRequest("secret/get", requestBody, "POST")
 	if err != nil {
 		return "", err
 	}
@@ -189,7 +189,7 @@ func (*Sdk) GetSecret(key string, options ...GetSecretOption) (string, error) {
 //
 // If the secret already exists, the user is prompted on whether to overwrite it.
 func (*Sdk) SetSecret(key string, value string) (string, error) {
-	body, err := daemon.AsyncRequest("secret/set", daemon.SetSecretBody{Key: key, Value: value})
+	body, err := daemon.AsyncRequest("secret/set", daemon.SetSecretBody{Key: key, Value: value}, "POST")
 	if err != nil {
 		return "", err
 	}
@@ -222,7 +222,7 @@ func (*Sdk) Track(tags []string, event string, metadata map[string]interface{}) 
 	}
 
 	// We suppress this error to be consistent with other languages
-	_ = daemon.SimpleRequest("track", requestBody)
+	_ = daemon.SimpleRequest("track", requestBody, "POST")
 
 	return nil
 }
@@ -240,7 +240,7 @@ func (*Sdk) Start(workflowName string) error {
 	}
 
 	// We suppress this error to be consistent with other languages
-	_ = daemon.SimpleRequest("track", requestBody)
+	_ = daemon.SimpleRequest("track", requestBody, "POST")
 
 	return nil
 }
@@ -249,7 +249,7 @@ func (*Sdk) Events(start, end string) ([]map[string]interface{}, error) {
 	result, err := daemon.SyncRequest("events", daemon.EventsBody{
 		Start: start,
 		End:   end,
-	})
+	}, "POST")
 
 	if err != nil {
 		return nil, fmt.Errorf("error getting events from backend: %w", err)
@@ -270,4 +270,37 @@ func (*Sdk) Events(start, end string) ([]map[string]interface{}, error) {
 	}
 
 	return events, nil
+}
+
+// UserInfo contains user info returned by daemon.
+type UserInfo struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
+// User returns the user info for the current user running the Op.
+func (*Sdk) User() (UserInfo, error) {
+	var body interface{}
+	method := "GET"
+	result, err := daemon.SyncRequest("user", body, method)
+
+	if err != nil {
+		return UserInfo{}, fmt.Errorf("error getting user information: %w", err)
+	}
+
+	// map results to UserInfo
+	mapValue := result.(map[string]interface{})
+	userInfo := UserInfo{}
+	if id, ok := mapValue["id"].(string); ok {
+		userInfo.ID = id
+	}
+	if username, ok := mapValue["username"].(string); ok {
+		userInfo.Username = username
+	}
+	if email, ok := mapValue["email"].(string); ok {
+		userInfo.Email = email
+	}
+
+	return userInfo, nil
 }
