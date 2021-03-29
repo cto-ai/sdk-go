@@ -304,3 +304,10 @@ func (*Sdk) User() (UserInfo, error) {
 
 	return userInfo, nil
 }
+
+// Log prints out formatted log.
+// message can be built using "fmt.Sprintf()"
+func (*Sdk) Log(message string) error {
+	_, err := fmt.Printf(message)
+	return err
+}
