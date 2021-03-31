@@ -311,3 +311,32 @@ func (*Sdk) Log(message string) error {
 	_, err := fmt.Printf(message)
 	return err
 }
+
+// TeamInfo contains user info returned by daemon.
+type TeamInfo struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// Team returns the team info for the current user running the Op.
+func (*Sdk) Team() (TeamInfo, error) {
+	var body interface{}
+	method := "GET"
+	result, err := daemon.SyncRequest("team", body, method)
+
+	if err != nil {
+		return TeamInfo{}, fmt.Errorf("error getting team information: %w", err)
+	}
+
+	// map results to TeamInfo
+	mapValue := result.(map[string]interface{})
+	teamInfo := TeamInfo{}
+	if id, ok := mapValue["id"].(string); ok {
+		teamInfo.ID = id
+	}
+	if name, ok := mapValue["name"].(string); ok {
+		teamInfo.Name = name
+	}
+
+	return teamInfo, nil
+}
