@@ -7,6 +7,10 @@ on:
         required: true
 
 jobs:
-  - name: Docker Build
-    run: |
-      docker build --build-arg SDK_TAG=v${{github.event.inputs.gitTag}} -f sdk-integration-testing/Dockerfile sdk-integration-testing
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Docker Build
+      run: |
+        docker build --build-arg SDK_TAG=v${{github.event.inputs.gitTag}} -f sdk-integration-testing/Dockerfile sdk-integration-testing
