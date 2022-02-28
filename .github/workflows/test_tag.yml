@@ -11,6 +11,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
     - name: Docker Build
       run: |
         docker build --build-arg SDK_TAG=v${{github.event.inputs.gitTag}} -f sdk-integration-testing/Dockerfile sdk-integration-testing
