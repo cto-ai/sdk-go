@@ -1,0 +1,16 @@
+name: Test Tag
+on:
+  workflow_dispatch:
+    inputs:
+      gitTag:
+        description: 'Tag version (e. 1.1.6)'
+        required: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Docker Build
+      run: |
+        docker build --build-arg SDK_TAG=${{github.event.inputs.gitTag}} -f sdk-integration-testing/Dockerfile sdk-integration-testing
