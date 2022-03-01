@@ -2,15 +2,18 @@ name: Test Tag
 on:
   workflow_dispatch:
     inputs:
-      gitTag:
-        description: 'Tag version (e. 1.1.6)'
+      tagToTest:
+        description: 'Tag to test'
         required: true
 
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: Docker Build
-      run: |
-        docker build --build-arg SDK_TAG=${{github.event.inputs.gitTag}} -f sdk-integration-testing/Dockerfile sdk-integration-testing
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.13
+        id: go
+      - name: Install dependencies
+        run: go get github.com/cto-ai/sdk-go/v2@${{ github.event.inputs.tagToTest }}
