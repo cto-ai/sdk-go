@@ -16,4 +16,4 @@ jobs:
           go-version: ^1.13
         id: go
       - name: Install dependencies
-        run: go get github.com/cto-ai/sdk-go/v2@${{ github.event.inputs.tagToTest }}
+        run: go get github.com/cto-ai/sdk-go/v2@v${{ github.event.inputs.tagToTest }}
