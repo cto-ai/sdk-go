@@ -6,9 +6,6 @@ ARG SDK_TAG=v2.2.3
 COPY --from=dep /bin/sdk-daemon /bin/.
 COPY --from=dep /bin/interaction-server /bin/.
 
-RUN ls /bin 
-
-
 RUN go get github.com/cto-ai/sdk-go/v2@${SDK_TAG}
 
 WORKDIR /build

@@ -49,5 +49,5 @@ jobs:
         cat ~/.gitconfig
         git config --global user.email "ops@cto.ai"
         git config --global user.name "$CI_USER"
-        git tag -a v$VERSION -m "Gitlab CI/CD releasing version $VERSION" || exit 1
-        git push https://${{ secrets.CTO_PAT }}@github.com/cto-ai/slackauth.git v$VERSION || exit 1
+        git tag -a v$VERSION -m "Github CI/CD releasing version $VERSION" || exit 1
+        git push https://${{ secrets.CTO_PAT }}@github.com/cto-ai/sdk-go.git v$VERSION || exit 1
