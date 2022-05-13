@@ -4,6 +4,19 @@
 
 The Ops Platform SDK for Go
 
+## Table of Contents
+
+- [sdk-go](#sdk-go)
+	- [Table of Contents](#table-of-contents)
+- [Usage](#usage)
+	- [Example sdk usage](#example-sdk-usage)
+	- [Running inside an op](#running-inside-an-op)
+	- [Documentation](#documentation)
+	- [Contributing](#contributing)
+	- [License](#license)
+
+---
+
 # Usage
 
 ## Example sdk usage
@@ -88,3 +101,21 @@ Corresponding ops.yml run command:
 ```yaml
 run: /ops/main
 ```
+
+## Documentation 
+
+- You can find the CTO.ai Go SDK documentation [on the docs website](https://cto.ai/docs/golang-sdk-overview)
+
+
+## Contributing 
+
+The main aim of this repository is to continue developing and advancing CTO.ai Go, making it faster and more simplified to use. Kindly check our [contributing guide](https://github.com/cto-ai/sdk-go/blob/master/CONTRIBUTING.md) on how to propose bug fixes and improvements, as well as submit pull requests to the project.
+
+
+## License
+
+&copy; Hack Capital Ventures, Inc., 2022
+
+Distributed under MIT License (`The MIT License`).
+
+See [LICENSE](LICENSE) for more information.
