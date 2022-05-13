@@ -104,12 +104,12 @@ run: /ops/main
 
 ## Documentation 
 
-- You can find the CTO.ai and CTO.ai Go SDK documentation [on the docs website](https://cto.ai/docs/golang-sdk-overview)
+- You can find the CTO.ai Go SDK documentation [on the docs website](https://cto.ai/docs/golang-sdk-overview)
 
 
 ## Contributing 
 
-The main aim of this repository is to continue developing and advancing CTO.ai Go, making it faster and more simplified to use. Kindly check our [contributing guide](https://github.com/cto-ai/sdk-go/blob/master/CONTRIBUTING.md) on how to propose bugfixes and improvements, and submitting pull requests to the project.
+The main aim of this repository is to continue developing and advancing CTO.ai Go, making it faster and more simplified to use. Kindly check our [contributing guide](https://github.com/cto-ai/sdk-go/blob/master/CONTRIBUTING.md) on how to propose bug fixes and improvements, as well as submit pull requests to the project.
 
 
 ## License
